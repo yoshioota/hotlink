@@ -1,24 +1,34 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## インストール
 
-Things you may want to cover:
+### envコピー
 
-* Ruby version
+```bash
+cp .env.example .env
+cp back/.env.example back/.env
+cp front/.env.local.example front/.env.local
+```
 
-* System dependencies
+### docker compose up
 
-* Configuration
+```bash
+docker compose up
+```
 
-* Database creation
+## DB構築
 
-* Database initialization
+※ ちなみにridgepole使ってます
 
-* How to run the test suite
+```bash
+cd back
+rails db:create
+rake ridgepole:update
+rails db:seed
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## マイグレーション
 
-* Deployment instructions
-
-* ...
+```
+rake ridgepole:update
+```

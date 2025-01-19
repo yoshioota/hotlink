@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "post HL",
+  "description": "",
+  "version": "0.0.1",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "serviceWorker.js"
+  },
+  "action": {}
+}

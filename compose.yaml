@@ -1,0 +1,97 @@
+name: hotlink
+
+services:
+  # NOTE: PostgreSQL ってこんなに書かないといけないっけ?
+  postgres:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - "./dockers/postgresql/postgresql.conf:/usr/local/etc/postgres/postgres.conf"
+      - "./dockers/postgresql/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      # see: https://stackoverflow.com/questions/51168558/how-to-mount-a-postgresql-volume-using-aws-ebs-in-kubernete
+      # see: https://qiita.com/mm_sys/items/996991d19b0d6e5c0715
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRESQL_PORT}:5432"
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+
+  # NOTE: backとsidekiq 1つにまとめられる？
+  back:
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: ./dockers/ruby/ruby.dev.Dockerfile
+      args:
+        RUBY_VERSION: 3.4.1
+    volumes:
+      - ./back:/app
+      - /app/tmp/
+    tmpfs:
+      # NOTE: たまにtmp/pids/server.pid が残ってしまい、Railsが立ち上がらなくなるので毎回消えるようにtmpfsでマウント
+      - /app/tmp/pids/
+    environment:
+      # NTOE: hostname=redis,postgresはdocker compose内のホスト名なのでデフォルトポートで良い
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/hotlink_development?encoding=unicode
+    depends_on:
+      - "redis"
+    ports:
+      - "${RAILS_PORT}:3000"
+    command: /bin/sh -c "bundle install && bin/rails server -b '0.0.0.0'"
+
+  sidekiq:
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: ./dockers/ruby/ruby.dev.Dockerfile
+      args:
+        RUBY_VERSION: 3.4.1
+    volumes:
+      - ./back:/app
+      - /app/tmp/
+    tmpfs:
+      - /app/tmp/pids/
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/hotlink_development?encoding=unicode
+    depends_on:
+      - "redis"
+    command: /bin/sh -c "bundle install && bundle exec sidekiq"
+
+  front:
+    build:
+        context: .
+        dockerfile: ./dockers/node/node.dev.Dockerfile
+    volumes:
+      - ./front:/app
+      - front_node_modules:/app/node_modules
+    ports:
+      - "${NEXT_JS_PORT}:3000"
+    command: /bin/sh -c "npm install && npm run dev"
+
+  chrome:
+    build:
+      context: .
+      dockerfile: ./dockers/node/node.dev.Dockerfile
+    volumes:
+      - ./post_link:/app
+      - chrome_ext_node_modules:/app/node_modules
+#    ports:
+#      - "${NEXT_JS_PORT}:3000"
+    command: /bin/sh -c "npm install && npm run dev"
+
+volumes:
+  postgres_data:
+  front_node_modules:
+  chrome_ext_node_modules:
+  redis_data:

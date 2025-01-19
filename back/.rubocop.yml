@@ -1,8 +1,86 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+inherit_from: .rubocop_todo.yml
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+AllCops:
+  Exclude:
+    - 'db/schema.rb'
+
+Lint/UselessMethodDefinition:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
+Style/BlockComments:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/SoleNestedConditional:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/WhileUntilModifier:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Layout/SpaceAroundOperators:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/MultilineTernaryOperator:
+  Enabled: false
+
+Style/Lambda:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Style/RedundantAssignment:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/CombinableLoops:
+  Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/IfInsideElse:
+  Enabled: false
+
+Style/Next:
+  Enabled: false

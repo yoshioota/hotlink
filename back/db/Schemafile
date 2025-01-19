@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+# NOTE: ridgepoleで使用するテーブル定義をまとめるファイル
+# ridgepole.rake Schemafileを呼び出すようにしてあります
+# 個々のテーブル定義は./schemaに***.rp.rbとして入れてます
+# ちなみにrailsのマイグレーションではないのでマイグレーション時にデータのメンテナンスを行うことができないので
+# one shot rake でデータのメンテナンスを行う必要あり
+
+$table_options = { force: :cascade }
+
+pattern = File.expand_path(File.join(__FILE__, '../schema/**.rp.rb'))
+
+Dir[pattern].sort.each do |path|
+  require path
+end
